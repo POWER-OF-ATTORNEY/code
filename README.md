@@ -2,6 +2,11 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![unofficial Google Analytics for GitHub](https://gaforgithub.azurewebsites.net/api?repo=CKAD-exercises)](https://github.com/dgkanatsios/gaforgithub)
 
+# このドキュメントについて
+
+このドキュメントは、[CKAD-exercises](https://github.com/dgkanatsios/CKAD-exercises)の日本語訳です。
+まだ翻訳途中ですが、CKADを取りたい日本人の助けになれば幸いです。
+
 # CKADの練習
 
 [Certified Kubernetes Application Developer](https://www.cncf.io/certification/ckad/)試験対策の手助けになる問題集です。Cloud Native Computing Foundationが提供しています。 カリキュラム別に. Kubernetesの学習と練習に役立つ事でしょう。
