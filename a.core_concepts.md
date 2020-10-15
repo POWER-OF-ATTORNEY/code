@@ -1,5 +1,17 @@
 ![](https://gaforgithub.azurewebsites.net/api?repo=CKAD-exercises/core_concepts&empty)
-# Core Concepts (13%)
+# コアコンセプト (13%)
+
+kubernetes.io > ドキュメント > リファレンス > kubectl CLI > [kubectlチートシート](https://kubernetes.io/ja/docs/reference/kubectl/cheatsheet/)
+
+kubernetes.io > ドキュメント > タスク > 監視、ログ、デバック > [実行中のコンテナへのシェルを取得する](https://kubernetes.io/ja/docs/tasks/debug-application-cluster/get-shell-running-container/)
+
+kubernetes.io > ドキュメント > タスク > クラスター内アプリケーションへのアクセス > [複数のクラスターへのアクセスを設定する](https://kubernetes.io/ja/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
+
+kubernetes.io > ドキュメント > タスク > クラスター内アプリケーションへのアクセス > [クラスターへのアクセス(EN)](https://kubernetes.io/docs/tasks/access-application-cluster/access-cluster/) APIを利用した
+
+kubernetes.io > ドキュメント > タスク > クラスター内アプリケーションへのアクセス > [ポートフォワーディングを利用したクラスター内アプリケーションへのアクセス(EN)](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/)
+
+<details><summary>原文(英語)</summary>
 
 kubernetes.io > Documentation > Reference > kubectl CLI > [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 
@@ -11,9 +23,11 @@ kubernetes.io > Documentation > Tasks > Access Applications in a Cluster > [Acce
 
 kubernetes.io > Documentation > Tasks > Access Applications in a Cluster > [Use Port Forwarding to Access Applications in a Cluster](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/)
 
-### Create a namespace called 'mynamespace' and a pod with image nginx called nginx on this namespace
+</details>
 
-<details><summary>show</summary>
+### 'mynamespace' という名前でNamespaceを作成し、'nginx'という名前でnginxが稼動するPodを作成してください。
+
+<details><summary>回答例</summary>
 <p>
 
 ```bash
@@ -24,12 +38,12 @@ kubectl run nginx --image=nginx --restart=Never -n mynamespace
 </p>
 </details>
 
-### Create the pod that was just described using YAML
+### さっき作成したPodをYAMLファイルを利用して作成してください。Create the pod that was just described using YAML
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
-Easily generate YAML with:
+YAMLファイルの簡単な作成方法:
 
 ```bash
 kubectl run nginx --image=nginx --restart=Never --dry-run=client -n mynamespace -o yaml > pod.yaml
@@ -62,7 +76,7 @@ status: {}
 kubectl create -f pod.yaml -n mynamespace
 ```
 
-Alternatively, you can run in one line
+変わりに、ワンライナーでも実行できます。
 
 ```bash
 kubectl run nginx --image=nginx --restart=Never --dry-run=client -o yaml | kubectl create -n mynamespace -f -
@@ -71,39 +85,39 @@ kubectl run nginx --image=nginx --restart=Never --dry-run=client -o yaml | kubec
 </p>
 </details>
 
-### Create a busybox pod (using kubectl command) that runs the command "env". Run it and see the output
+### busyboxが稼動するPodを作成(kubectlコマンドを利用してください)して、"env"コマンドを実行、出力を確認してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
-kubectl run busybox --image=busybox --command --restart=Never -it -- env # -it will help in seeing the output
-# or, just run it without -it
-kubectl run busybox --image=busybox --command --restart=Never -- env
-# and then, check its logs
+kubectl run busybox --image=busybox --command --restart=never -it -- env # -it オプションを利用すると出力を直接取得できます。
+# もしくは、-itオプション無しで実行して
+kubectl run busybox --image=busybox --command --restart=never -- env
+# ログを確認しましょう。
 kubectl logs busybox
 ```
 
 </p>
 </details>
 
-### Create a busybox pod (using YAML) that runs the command "env". Run it and see the output
+### busyboxのPodを作成(yamlを利用)して、"env"コマンドを実行、出力を確認してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
-# create a  YAML template with this command
+# yamlテンプレートを以下のコマンドで作成します。
 kubectl run busybox --image=busybox --restart=Never --dry-run=client -o yaml --command -- env > envpod.yaml
-# see it
+# 中身を確認しましょう。
 cat envpod.yaml
 ```
 
-```YAML
-apiVersion: v1
-kind: Pod
+```yaml
+apiversion: v1
+kind: pod
 metadata:
-  creationTimestamp: null
+  creationtimestamp: null
   labels:
     run: busybox
   name: busybox
@@ -114,13 +128,13 @@ spec:
     image: busybox
     name: busybox
     resources: {}
-  dnsPolicy: ClusterFirst
-  restartPolicy: Never
+  dnspolicy: clusterfirst
+  restartpolicy: never
 status: {}
 ```
 
 ```bash
-# apply it and then see the logs
+# これをapplyして、ログを確認しましょう。
 kubectl apply -f envpod.yaml
 kubectl logs busybox
 ```
@@ -128,9 +142,9 @@ kubectl logs busybox
 </p>
 </details>
 
-### Get the YAML for a new namespace called 'myns' without creating it
+### 新しいnamespace 'myns'を作成するyamlを、ネームスペースを作成する事なく出力してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
@@ -140,9 +154,9 @@ kubectl create namespace myns -o yaml --dry-run=client
 </p>
 </details>
 
-### Get the YAML for a new ResourceQuota called 'myrq' with hard limits of 1 CPU, 1G memory and 2 pods without creating it
+### 'myrq'という名前で、1CPU、メモリ1G、ポッド数2のハードリミットを持つresourcequotaを作成するYAMLファイルをPodを作成する事なく出力してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
@@ -152,9 +166,9 @@ kubectl create quota myrq --hard=cpu=1,memory=1G,pods=2 --dry-run=client -o yaml
 </p>
 </details>
 
-### Get pods on all namespaces
+### 全namespacesのPod一覧を取得してください
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
@@ -168,30 +182,30 @@ kubectl get po -A
 </p>
 </details>
 
-### Create a pod with image nginx called nginx and expose traffic on port 80
+### nginxが稼動するPodを作成し、80番ポートへの通信を許可してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
-kubectl run nginx --image=nginx --restart=Never --port=80
+kubectl run nginx --image=nginx --restart=never --port=80
 ```
 
 </p>
 </details>
 
-### Change pod's image to nginx:1.7.1. Observe that the container will be restarted as soon as the image gets pulled
+### Podのイメージをnginx:1.7.1にしてください。Imageが取得された後すぐにPodが削除されて再生成されるのを観測してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 *Note*: The `RESTARTS` column should contain 0 initially (ideally - it could be any number)
 
 ```bash
-# kubectl set image POD/POD_NAME CONTAINER_NAME=IMAGE_NAME:TAG
+# kubectl set image pod/pod_name container_name=image_name:tag
 kubectl set image pod/nginx nginx=nginx:1.7.1
-kubectl describe po nginx # you will see an event 'Container will be killed and recreated'
-kubectl get po nginx -w # watch it
+kubectl describe po nginx # 'container will be killed and recreated' というログを確認できます
+kubectl get po nginx -w # 監視
 ```
 
 *Note*: some time after changing the image, you should see that the value in the `RESTARTS` column has been increased by 1, because the container has been restarted, as stated in the events shown at the bottom of the `kubectl describe pod` command:
@@ -208,7 +222,7 @@ Events:
   Normal  Started    36s (x2 over 9m43s)  kubelet, node3     Started container pod1
 ```
 
-*Note*: you can check pod's image by running
+*note*: 動作しているイメージのチェック
 
 ```bash
 kubectl get po nginx -o jsonpath='{.spec.containers[].image}{"\n"}'
@@ -217,23 +231,24 @@ kubectl get po nginx -o jsonpath='{.spec.containers[].image}{"\n"}'
 </p>
 </details>
 
-### Get nginx pod's ip created in previous step, use a temp busybox image to wget its '/'
+### 先程作成したNginxPodのIPアドレスを取得して、一時的なbusyboxのイメージからnginxの'/'をwgetで取得してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
-kubectl get po -o wide # get the IP, will be something like '10.1.1.131'
-# create a temp busybox pod
-kubectl run busybox --image=busybox --rm -it --restart=Never -- wget -O- 10.1.1.131:80
+kubectl get po -o wide # IPを取得、'10.1.1.131'のようなアドレスが取得できます。
+# 一時的なbusyboxPodを作成
+kubectl run busybox --image=busybox --rm -it --restart=never -- wget -o- 10.1.1.131:80
 ```
 
-Alternatively you can also try a more advanced option:
+もしくは、このようにより多くのオプションを利用します:
+alternatively you can also try a more advanced option:
 
 ```bash
-# Get IP of the nginx pod
+# nginxPodのIPを取得
 NGINX_IP=$(kubectl get pod nginx -o jsonpath='{.status.podIP}')
-# create a temp busybox pod
+# 一時的なbusyboxPodを作成
 kubectl run busybox --image=busybox --env="NGINX_IP=$NGINX_IP" --rm -it --restart=Never -- sh -c 'wget -O- $NGINX_IP:80'
 ``` 
 
@@ -246,27 +261,27 @@ kubectl run busybox --image=busybox --rm -it --restart=Never -- wget -O- $(kubec
 </p>
 </details>
 
-### Get pod's YAML
+### 稼動中のPodのYAMLを取得してください
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
 kubectl get po nginx -o yaml
-# or
+# または
 kubectl get po nginx -oyaml
-# or
+# もしくは
 kubectl get po nginx --output yaml
-# or
+# あるいは
 kubectl get po nginx --output=yaml
 ```
 
 </p>
 </details>
 
-### Get information about the pod, including details about potential issues (e.g. pod hasn't started)
+### 障害の可能性がわかるようなPodの情報を取得してください。(例:Podが起動していない)
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
@@ -276,9 +291,9 @@ kubectl describe po nginx
 </p>
 </details>
 
-### Get pod logs
+### Podのログを取得してください
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
@@ -288,9 +303,9 @@ kubectl logs nginx
 </p>
 </details>
 
-### If pod crashed and restarted, get logs about the previous instance
+### もし、Podがクラッシュして再起動している場合は、一つ前のインスタンスについてのログを取得してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
@@ -301,8 +316,9 @@ kubectl logs nginx -p
 </details>
 
 ### Execute a simple shell on the nginx pod
+nginxのPod上で、シェルを実行してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
@@ -312,47 +328,47 @@ kubectl exec -it nginx -- /bin/sh
 </p>
 </details>
 
-### Create a busybox pod that echoes 'hello world' and then exits
+### 'hello world'と出力した後終了するbusyboxのPodを作成してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
 kubectl run busybox --image=busybox -it --restart=Never -- echo 'hello world'
-# or
+# または
 kubectl run busybox --image=busybox -it --restart=Never -- /bin/sh -c 'echo hello world'
 ```
 
 </p>
 </details>
 
-### Do the same, but have the pod deleted automatically when it's completed
+### 同じ事をします、今度は処理の終了後にPodが自動的に削除されるようにしてください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
 kubectl run busybox --image=busybox -it --rm --restart=Never -- /bin/sh -c 'echo hello world'
-kubectl get po # nowhere to be found :)
+kubectl get po # 何も表示されなければOK (^ ^)
 ```
 
 </p>
 </details>
 
-### Create an nginx pod and set an env value as 'var1=val1'. Check the env value existence within the pod
+### nginxのPodを作成して、環境変数'var1=val1'を設定してください。その後、Podの中で環境変数の存在を確認してください。
 
-<details><summary>show</summary>
+<details><summary>回答例</summary>
 <p>
 
 ```bash
 kubectl run nginx --image=nginx --restart=Never --env=var1=val1
-# then
+# その後
 kubectl exec -it nginx -- env
-# or
+# または
 kubectl exec -it nginx -- sh -c 'echo $var1'
-# or
+# もしくは
 kubectl describe po nginx | grep val1
-# or
+# あるいは
 kubectl run nginx --restart=Never --image=nginx --env=var1=val1 -it --rm -- env
 ```
 

@@ -1,10 +1,10 @@
 ![](https://gaforgithub.azurewebsites.net/api?repo=CKAD-exercises/pod_design&empty)
-# Pod design (20%)
+# Podの設計 (20%)
 
-## Labels and annotations
-kubernetes.io > Documentation > Concepts > Overview > [Labels and Selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors)
+## ラベルとアノテーション
+kubernetes.io > ドキュメント > コンセプト > 概要 > [ラベル(Labels)とセレクター(Selectors)](https://kubernetes.io/ja/docs/concepts/overview/working-with-objects/labels/#label-selectors)
 
-### Create 3 pods with names nginx1,nginx2,nginx3. All of them should have the label app=v1
+### nginx1,nginx2,nginx3という名前でPodを3つ作成しましょう。全てのPodに'app=v1'のラベルを付けてください。
 
 <details><summary>show</summary>
 <p>
@@ -18,7 +18,7 @@ kubectl run nginx3 --image=nginx --restart=Never --labels=app=v1
 </p>
 </details>
 
-### Show all labels of the pods
+### Podのラベルを全て出力してください
 
 <details><summary>show</summary>
 <p>
@@ -30,7 +30,7 @@ kubectl get po --show-labels
 </p>
 </details>
 
-### Change the labels of pod 'nginx2' to be app=v2
+### Pod'nginx2'のラベルを'app=v2'に変更してください
 
 <details><summary>show</summary>
 <p>
@@ -42,53 +42,54 @@ kubectl label po nginx2 app=v2 --overwrite
 </p>
 </details>
 
-### Get the label 'app' for the pods (show a column with APP labels)
+### Podの'app'ラベルを取得してください (ラベルの行を表示してください)
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl get po -L app
-# or
+# または
 kubectl get po --label-columns=app
 ```
 
 </p>
 </details>
 
-### Get only the 'app=v2' pods
+### 'app=v2'のラベルを持つPodのみ出力してください。
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl get po -l app=v2
-# or
+# または
 kubectl get po -l 'app in (v2)'
-# or
+# もしくは
 kubectl get po --selector=app=v2
 ```
 
 </p>
 </details>
 
-### Remove the 'app' label from the pods we created before
+### 先ほど作成したPodの'app'ラベルを削除してください。
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl label po nginx1 nginx2 nginx3 app-
-# or
+# もしくは
 kubectl label po nginx{1..3} app-
-# or
+# または
 kubectl label po -l app app-
 ```
 
 </p>
 </details>
 
-### Create a pod that will be deployed to a Node that has the label 'accelerator=nvidia-tesla-p100'
+### 'accelerator=nvidia-tesla-p100'のラベルを持つNodeにデプロイされるPodを作成してください。
+Create a pod that will be deployed to a Node that has the label 'accelerator=nvidia-tesla-p100'
 
 <details><summary>show</summary>
 <p>
