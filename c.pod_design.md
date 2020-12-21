@@ -94,14 +94,14 @@ Create a pod that will be deployed to a Node that has the label 'accelerator=nvi
 <details><summary>show</summary>
 <p>
 
-Add the label to a node:
+Nodeにラベルを追加する:
 
 ```bash
 kubectl label nodes <your-node-name> accelerator=nvidia-tesla-p100
 kubectl get nodes --show-labels
 ```
 
-We can use the 'nodeSelector' property on the Pod YAML:
+PodのYamlで 'nodeSelector' プロパティを利用できます:
 
 ```YAML
 apiVersion: v1
@@ -116,14 +116,14 @@ spec:
     accelerator: nvidia-tesla-p100 # the selection label
 ```
 
-You can easily find out where in the YAML it should be placed by:
+YAMLの何処に設定するかは、下記のコマンドで簡単に見つかりますout where in the YAML it should be placed by:
 
 ```bash
 kubectl explain po.spec
 ```
 
-OR:
-Use node affinity (https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/#schedule-a-pod-using-required-node-affinity)
+または:
+node affinity を使う(https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/#schedule-a-pod-using-required-node-affinity)
 
 ```YAML
 apiVersion: v1
@@ -147,7 +147,7 @@ spec:
 </p>
 </details>
 
-### Annotate pods nginx1, nginx2, nginx3 with "description='my description'" value
+### Pod nginx1、nginx2、nginx3 に "description='my description'" というアノテーションを付ける
 
 <details><summary>show</summary>
 <p>
@@ -156,7 +156,7 @@ spec:
 ```bash
 kubectl annotate po nginx1 nginx2 nginx3 description='my description'
 
-#or
+または
 
 kubectl annotate po nginx{1..3} description='my description'
 ```
@@ -164,7 +164,7 @@ kubectl annotate po nginx{1..3} description='my description'
 </p>
 </details>
 
-### Check the annotations for pod nginx1
+### Pod nginx1 のアノテーションを表示する
 
 <details><summary>show</summary>
 <p>
@@ -172,17 +172,17 @@ kubectl annotate po nginx{1..3} description='my description'
 ```bash
 kubectl describe po nginx1 | grep -i 'annotations'
 
-# or
+# または
 
 kubectl get pods -o custom-columns=Name:metadata.name,ANNOTATIONS:metadata.annotations.description
 ```
 
-As an alternative to using `| grep` you can use jsonPath like `kubectl get po nginx1 -o jsonpath='{.metadata.annotations}{"\n"}'`
+`| grep` を使用する代わりに、jsonPathを使う事もできます `kubectl get po nginx1 -o jsonpath='{.metadata.annotations}{"\n"}'`
 
 </p>
 </details>
 
-### Remove the annotations for these three pods
+### 3つのPodから、アノテーションを取り除いてください
 
 <details><summary>show</summary>
 <p>
@@ -194,7 +194,7 @@ kubectl annotate po nginx{1..3} description-
 </p>
 </details>
 
-### Remove these pods to have a clean state in your cluster
+### これらのPodを削除して、クラスタを掃除します
 
 <details><summary>show</summary>
 <p>
@@ -210,6 +210,7 @@ kubectl delete po nginx{1..3}
 
 kubernetes.io > Documentation > Concepts > Workloads > Controllers > [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment)
 
+### イメージがnignx:1.7.8で、レプリカ2つ持ち、80番ポートを公開したnginxというデプロイメントを作成してください。(serviceは作らないでください)
 ### Create a deployment with image nginx:1.7.8, called nginx, having 2 replicas, defining port 80 as the port that this container exposes (don't create a service for this deployment)
 
 <details><summary>show</summary>
@@ -218,14 +219,15 @@ kubernetes.io > Documentation > Concepts > Workloads > Controllers > [Deployment
 ```bash
 kubectl create deployment nginx  --image=nginx:1.7.8  --dry-run=client -o yaml > deploy.yaml
 vi deploy.yaml
-# change the replicas field from 1 to 2
+# フィールドを 1 から 2 に変更します
+# deploy.yamlのコンテナspecにこの記述を追加して保存します
 # add this section to the container spec and save the deploy.yaml file
 # ports:
 #   - containerPort: 80
 kubectl apply -f deploy.yaml
 ```
 
-or, do something like:
+もしくは、以下のようにします
 
 ```bash
 kubectl create deployment nginx  --image=nginx:1.7.8  --dry-run=client -o yaml | sed 's/replicas: 1/replicas: 2/g'  | sed 's/image: nginx:1.7.8/image: nginx:1.7.8\n        ports:\n        - containerPort: 80/g' | kubectl apply -f -
@@ -239,7 +241,7 @@ kubectl create deploy nginx --image=nginx:1.7.8 --replicas=2 --port=80
 </p>
 </details>
 
-### View the YAML of this deployment
+### このdeploymentのYAMLを表示します
 
 <details><summary>show</summary>
 <p>
@@ -251,40 +253,40 @@ kubectl get deploy nginx -o yaml
 </p>
 </details>
 
-### View the YAML of the replica set that was created by this deployment
+### View the YAML of the replica set that was created by this deploymentで作成されたReplicaSetのYAMLを表示します
 
 <details><summary>show</summary>
 <p>
 
 ```bash
-kubectl describe deploy nginx # you'll see the name of the replica set on the Events section and in the 'NewReplicaSet' property
-# OR you can find rs directly by:
-kubectl get rs -l run=nginx # if you created deployment by 'run' command
-kubectl get rs -l app=nginx # if you created deployment by 'create' command
-# you could also just do kubectl get rs
+kubectl describe deploy nginx # Eventsセクションの'NewReplicaSet'プロパティでReplicaSetの名前を確認できます
+# または、直接ReplicaSetを見つけます
+kubectl get rs -l run=nginx # 'run' コマンドでdeploymentを作成した場合
+kubectl get rs -l app=nginx # 'create' コマンドでdeploymentを作成した場合
+# kubectl get rs で取得する事もできます
 kubectl get rs nginx-7bf7478b77 -o yaml
 ```
 
 </p>
 </details>
 
-### Get the YAML for one of the pods
+### 1つのPodのYAMLを表示してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
-kubectl get po # get all the pods
-# OR you can find pods directly by:
-kubectl get po -l run=nginx # if you created deployment by 'run' command
-kubectl get po -l app=nginx # if you created deployment by 'create' command
+kubectl get po # 全てのPodを取得します
+# もしくは、直接Podを取得できます:
+kubectl get po -l run=nginx # 'run' コマンドでdeploymentを作成した場合
+kubectl get po -l app=nginx # 'create' コマンドでdeploymentを作成した場合
 kubectl get po nginx-7bf7478b77-gjzp8 -o yaml
 ```
 
 </p>
 </details>
 
-### Check how the deployment rollout is going
+### deployment の rollout の進捗を確認する
 
 <details><summary>show</summary>
 <p>
@@ -296,23 +298,23 @@ kubectl rollout status deploy nginx
 </p>
 </details>
 
-### Update the nginx image to nginx:1.7.9
+### nginx のイメージを nginx:1.7.9 に変更してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl set image deploy nginx nginx=nginx:1.7.9
-# alternatively...
-kubectl edit deploy nginx # change the .spec.template.spec.containers[0].image
+# もしくは...
+kubectl edit deploy nginx # .spec.template.spec.containers[0].imageを変更します
 ```
 
-The syntax of the 'kubectl set image' command is `kubectl set image (-f FILENAME | TYPE NAME) CONTAINER_NAME_1=CONTAINER_IMAGE_1 ... CONTAINER_NAME_N=CONTAINER_IMAGE_N [options]`
+'kubectl set image' コマンドのシンタックスは `kubectl set image (-f FILENAME | TYPE NAME) CONTAINER_NAME_1=CONTAINER_IMAGE_1 ... CONTAINER_NAME_N=CONTAINER_IMAGE_N [options]`
 
 </p>
 </details>
 
-### Check the rollout history and confirm that the replicas are OK
+### Rollout の履歴を確認し、Replicaが正常かどうか確認してください
 
 <details><summary>show</summary>
 <p>
@@ -320,60 +322,60 @@ The syntax of the 'kubectl set image' command is `kubectl set image (-f FILENAME
 ```bash
 kubectl rollout history deploy nginx
 kubectl get deploy nginx
-kubectl get rs # check that a new replica set has been created
+kubectl get rs # 新しいレプリカが作成されているか確認
 kubectl get po
 ```
 
 </p>
 </details>
 
-### Undo the latest rollout and verify that new pods have the old image (nginx:1.7.8)
+### 最後のrolloutを戻して、新しいPodが古いイメージで動作しているかを確認してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl rollout undo deploy nginx
-# wait a bit
+# 少し待ちます
 kubectl get po # select one 'Running' Pod
-kubectl describe po nginx-5ff4457d65-nslcl | grep -i image # should be nginx:1.7.8
+kubectl describe po nginx-5ff4457d65-nslcl | grep -i image # nginx:1.7.8 である必要があります
 ```
 
 </p>
 </details>
 
-### Do an on purpose update of the deployment with a wrong image nginx:1.91
+### nginx:1.91という間違ったイメージで意図的にdeploymentを更新します
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl set image deploy nginx nginx=nginx:1.91
-# or
+# または
 kubectl edit deploy nginx
-# change the image to nginx:1.91
-# vim tip: type (without quotes) '/image' and Enter, to navigate quickly
+# image を nginx:1.91 に変更します
+# vim tip: '/image' と(クォート無しで)入力してEnterを押すと、素早く移動できます
 ```
 
 </p>
 </details>
 
-### Verify that something's wrong with the rollout
+### Rolloutが何処かおかしい事を確認します
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl rollout status deploy nginx
-# or
-kubectl get po # you'll see 'ErrImagePull'
+# または
+kubectl get po # 'ErrImagePull'が見えるハズです
 ```
 
 </p>
 </details>
 
 
-### Return the deployment to the second revision (number 2) and verify the image is nginx:1.7.9
+### Deployment を2番目のリビジョンに戻して、nginx:1.7.9イメージで動作している事を確認してください
 
 <details><summary>show</summary>
 <p>
@@ -381,13 +383,14 @@ kubectl get po # you'll see 'ErrImagePull'
 ```bash
 kubectl rollout undo deploy nginx --to-revision=2
 kubectl describe deploy nginx | grep Image:
-kubectl rollout status deploy nginx # Everything should be OK
+kubectl rollout status deploy nginx # 全て問題無い必要があります
 ```
 
 </p>
 </details>
 
-### Check the details of the fourth revision (number 4)
+### 4番目のリビジョンの詳細を確認してください
+
 
 <details><summary>show</summary>
 <p>
@@ -399,7 +402,7 @@ kubectl rollout history deploy nginx --revision=4 # You'll also see the wrong im
 </p>
 </details>
 
-### Scale the deployment to 5 replicas
+### Deploymentをレプリカ数5にスケールさせてください
 
 <details><summary>show</summary>
 <p>
@@ -413,7 +416,7 @@ kubectl describe deploy nginx
 </p>
 </details>
 
-### Autoscale the deployment, pods between 5 and 10, targetting CPU utilization at 80%
+### DeploymentをPod数が5から10個になるようオートスケールさせてください。しきい値はCPU使用率が80%以上です
 
 <details><summary>show</summary>
 <p>
@@ -425,7 +428,7 @@ kubectl autoscale deploy nginx --min=5 --max=10 --cpu-percent=80
 </p>
 </details>
 
-### Pause the rollout of the deployment
+### Deploymentのrolloutを一時停止させてください
 
 <details><summary>show</summary>
 <p>
@@ -437,23 +440,23 @@ kubectl rollout pause deploy nginx
 </p>
 </details>
 
-### Update the image to nginx:1.9.1 and check that there's nothing going on, since we paused the rollout
+### イメージをnginx:1.9.1にアップデートしてそれがrolloutを停止させた以降デプロイされてない事を確認してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl set image deploy nginx nginx=nginx:1.9.1
-# or
+# または
 kubectl edit deploy nginx
-# change the image to nginx:1.9.1
+# imageをnginx:1.9.1に変更
 kubectl rollout history deploy nginx # no new revision
 ```
 
 </p>
 </details>
 
-### Resume the rollout and check that the nginx:1.9.1 image has been applied
+### Rolloutのデプロイを再開し、イメージnginx:1.9.1がデプロイされる事を確認してください
 
 <details><summary>show</summary>
 <p>
@@ -461,14 +464,13 @@ kubectl rollout history deploy nginx # no new revision
 ```bash
 kubectl rollout resume deploy nginx
 kubectl rollout history deploy nginx
-kubectl rollout history deploy nginx --revision=6 # insert the number of your latest revision
+kubectl rollout history deploy nginx --revision=6 # 最新のrevision番号を挿入してください
 ```
 
 </p>
 </details>
 
-### Delete the deployment and the horizontal pod autoscaler you created
-
+### Deployment と horizontal pod autoscaler を削除してください
 <details><summary>show</summary>
 <p>
 
@@ -484,7 +486,7 @@ kubectl delete deploy/nginx hpa/nginx
 
 ## Jobs
 
-### Create a job with image perl that runs the command with arguments "perl -Mbignum=bpi -wle 'print bpi(2000)'"
+### "perl -Mbignum=bpi -wle 'print bpi(2000)'"のコマンドと引数を実行するjobをperlイメージで作成してください
 
 <details><summary>show</summary>
 <p>
@@ -496,22 +498,22 @@ kubectl create job pi  --image=perl -- perl -Mbignum=bpi -wle 'print bpi(2000)'
 </p>
 </details>
 
-### Wait till it's done, get the output
+### jobが終了するまで待って、出力を取得してください。
 
 <details><summary>show</summary>
 <p>
 
 ```bash
-kubectl get jobs -w # wait till 'SUCCESSFUL' is 1 (will take some time, perl image might be big)
-kubectl get po # get the pod name
-kubectl logs pi-**** # get the pi numbers
+kubectl get jobs -w # 'SUCCESSFUL' が 1 になるまで待ちます。(will take some time, perl image might be big)
+kubectl get po # get the pod の名前を取得します
+kubectl logs pi-**** # 円周率を出力します
 kubectl delete job pi
 ```
 
 </p>
 </details>
 
-### Create a job with the image busybox that executes the command 'echo hello;sleep 30;echo world'
+### busyboxイメージで、'echo hello;sleep 30;echo world'を実行するjobを作成してください
 
 <details><summary>show</summary>
 <p>
@@ -523,7 +525,7 @@ kubectl create job busybox --image=busybox -- /bin/sh -c 'echo hello;sleep 30;ec
 </p>
 </details>
 
-### Follow the logs for the pod (you'll wait for 30 seconds)
+### Podのログを取得してください (30秒待つ必要があります)
 
 <details><summary>show</summary>
 <p>
@@ -536,7 +538,7 @@ kubectl logs busybox-ptx58 -f # follow the logs
 </p>
 </details>
 
-### See the status of the job, describe it and see the logs
+### jobの状態と詳細、ログを表示してください。
 
 <details><summary>show</summary>
 <p>
@@ -550,7 +552,7 @@ kubectl logs job/busybox
 </p>
 </details>
 
-### Delete the job
+### jobを削除してください
 
 <details><summary>show</summary>
 <p>
@@ -562,6 +564,7 @@ kubectl delete job busybox
 </p>
 </details>
 
+### jobを作成 しかし もし30秒以上終了しない場合は、kubernetesによって自動的に終了する事を確認する。
 ### Create a job but ensure that it will be automatically terminated by kubernetes if it takes more than 30 seconds to execute
 
 <details><summary>show</summary>
@@ -572,7 +575,7 @@ kubectl create job busybox --image=busybox --dry-run=client -o yaml -- /bin/sh -
 vi job.yaml
 ```
   
-Add job.spec.activeDeadlineSeconds=30
+job.spec.activeDeadlineSeconds=30 を追記
 
 ```bash
 apiVersion: batch/v1
@@ -604,6 +607,7 @@ status: {}
 </p>
 </details>
 
+### 同じjobを5つ作成してください。少し待って、ステータスと削除されているかを確認してください
 ### Create the same job, make it run 5 times, one after the other. Verify its status and delete it
 
 <details><summary>show</summary>
@@ -625,7 +629,7 @@ metadata:
     run: busybox
   name: busybox
 spec:
-  completions: 5 # add this line
+  completions: 5 # この行を追加
   template:
     metadata:
       creationTimestamp: null
@@ -648,16 +652,17 @@ status: {}
 kubectl create -f job.yaml
 ```
 
-Verify that it has been completed:
+正常に完了した事を確認する:
 
 ```bash
-kubectl get job busybox -w # will take two and a half minutes
+kubectl get job busybox -w # 2分半かかります
 kubectl delete jobs busybox
 ```
 
 </p>
 </details>
 
+### 同じjobを5つ並列に実行してください。
 ### Create the same job, but make it run 5 parallel times
 
 <details><summary>show</summary>
@@ -667,7 +672,7 @@ kubectl delete jobs busybox
 vi job.yaml
 ```
 
-Add job.spec.parallelism=5
+job.spec.parallelism=5 を追加
 
 ```YAML
 apiVersion: batch/v1
@@ -678,7 +683,7 @@ metadata:
     run: busybox
   name: busybox
 spec:
-  parallelism: 5 # add this line
+  parallelism: 5 # この行を追加
   template:
     metadata:
       creationTimestamp: null
@@ -702,7 +707,7 @@ kubectl create -f job.yaml
 kubectl get jobs
 ```
 
-It will take some time for the parallel jobs to finish (>= 30 seconds)
+並列実行したjobが終了するまで少しかかります(30秒以上)
 
 ```bash
 kubectl delete job busybox
@@ -713,9 +718,10 @@ kubectl delete job busybox
 
 ## Cron jobs
 
-kubernetes.io > Documentation > Tasks > Run Jobs > [Running Automated Tasks with a CronJob](https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/)
+kubernetes.io > Documentation > Tasks > Run Jobs > [自動化されたタスクをCronJobで実行する (en)](https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/)
 
-### Create a cron job with image busybox that runs on a schedule of "*/1 * * * *" and writes 'date; echo Hello from the Kubernetes cluster' to standard output
+### busyboxイメージを使って、'date; echo Hello from the Kubernetes cluster'と標準出力に書き込むジョブを"*/1 * * * *"にスケジュールしてください
+
 
 <details><summary>show</summary>
 <p>
@@ -727,7 +733,7 @@ kubectl create cronjob busybox --image=busybox --schedule="*/1 * * * *" -- /bin/
 </p>
 </details>
 
-### See its logs and delete it
+### そのログを見て、ジョブを削除してください
 
 <details><summary>show</summary>
 <p>
@@ -735,9 +741,9 @@ kubectl create cronjob busybox --image=busybox --schedule="*/1 * * * *" -- /bin/
 ```bash
 kubectl get cj
 kubectl get jobs --watch
-kubectl get po --show-labels # observe that the pods have a label that mentions their 'parent' job
+kubectl get po --show-labels # podには親のジョブを示すラベルが付いている事に注意してください
 kubectl logs busybox-1529745840-m867r
-# Bear in mind that Kubernetes will run a new job/pod for each new cron job
+# Kubernetesは新しいcronjobごとに新しいjob/podを生成する事に注意してください
 kubectl delete cj busybox
 ```
 
@@ -745,6 +751,7 @@ kubectl delete cj busybox
 </details>
 
 ### Create a cron job with image busybox that runs every minute and writes 'date; echo Hello from the Kubernetes cluster' to standard output. The cron job should be terminated if it takes more than 17 seconds to start execution after its schedule.
+### busyboxイメージを使って、'date; echo Hello from the Kubernetes cluster'と毎分標準出力に書き込むジョブを作成してください。ただしスケジュールされてから17秒以上かかる場合は終了する必要があります
 
 <details><summary>show</summary>
 <p>
@@ -753,7 +760,7 @@ kubectl delete cj busybox
 kubectl create cronjob time-limited-job --image=busybox --restart=Never --dry-run=client --schedule="* * * * *" -o yaml -- /bin/sh -c 'date; echo Hello from the Kubernetes cluster' > time-limited-job.yaml
 vi time-limited-job.yaml
 ```
-Add cronjob.spec.startingDeadlineSeconds=17
+cronjob.spec.startingDeadlineSeconds=17 を追記
 
 ```bash
 apiVersion: batch/v1beta1
@@ -762,7 +769,7 @@ metadata:
   creationTimestamp: null
   name: time-limited-job
 spec:
-  startingDeadlineSeconds: 17 # add this line
+  startingDeadlineSeconds: 17 # この行を追記
   jobTemplate:
     metadata:
       creationTimestamp: null
