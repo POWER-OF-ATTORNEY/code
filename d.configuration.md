@@ -3,9 +3,9 @@
 
 ## ConfigMaps
 
-kubernetes.io > Documentation > Tasks > Configure Pods and Containers > [Configure a Pod to Use a ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/)
+kubernetes.io > ドキュメント > タスク > Podとコンテナの設定 > [Podを構成してConfigMapを使用する](https://kubernetes.io/ja/docs/tasks/configure-pod-container/configure-pod-configmap/)
 
-### Create a configmap named config with values foo=lala,foo2=lolo
+### configという名前で、foo=lala,foo2=loloの値を持つconfigmapを作成してください
 
 <details><summary>show</summary>
 <p>
@@ -17,23 +17,23 @@ kubectl create configmap config --from-literal=foo=lala --from-literal=foo2=lolo
 </p>
 </details>
 
-### Display its values
+### 設定した値を表示してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl get cm config -o yaml
-# or
+# または
 kubectl describe cm config
 ```
 
 </p>
 </details>
 
-### Create and display a configmap from a file
+### configmapをファイルから作成して表示させてください
 
-Create the file with
+下記コマンドでファイルを作成します
 
 ```bash
 echo -e "foo3=lili\nfoo4=lele" > config.txt
@@ -52,7 +52,7 @@ kubectl get cm configmap2 -o yaml
 
 ### Create and display a configmap from a .env file
 
-Create the file with the command
+下記コマンドでファイルを作成します
 
 ```bash
 echo -e "var1=val1\n# this is a comment\n\nvar2=val2\n#anothercomment" > config.env
@@ -70,8 +70,9 @@ kubectl get cm configmap3 -o yaml
 </details>
 
 ### Create and display a configmap from a file, giving the key 'special'
+### 'special'というキーで、ファイルからconfigmapを作成してください
 
-Create the file with
+下記コマンドでファイルを作成します
 
 ```bash
 echo -e "var3=val3\nvar4=val4" > config4.txt
@@ -89,7 +90,7 @@ kubectl get cm configmap4 -o yaml
 </p>
 </details>
 
-### Create a configMap called 'options' with the value var5=val5. Create a new nginx pod that loads the value from variable 'var5' in an env variable called 'option'
+### 'options'という名前で、var5=val5という値をもつconfigMapを作成して、nginxが稼働するpodを作成し、'option'環境変数から'val5'の値を参照してください
 
 <details><summary>show</summary>
 <p>
@@ -115,11 +116,11 @@ spec:
     name: nginx
     resources: {}
     env:
-    - name: option # name of the env variable
+    - name: option # 環境変数の名前
       valueFrom:
         configMapKeyRef:
-          name: options # name of config map
-          key: var5 # name of the entity in config map
+          name: options # configMapの名前
+          key: var5 # configMap内の値の名前
   dnsPolicy: ClusterFirst
   restartPolicy: Never
 status: {}
@@ -127,13 +128,13 @@ status: {}
 
 ```bash
 kubectl create -f pod.yaml
-kubectl exec -it nginx -- env | grep option # will show 'option=val5'
+kubectl exec -it nginx -- env | grep option # 'option=val5'が表示されます
 ```
 
 </p>
 </details>
 
-### Create a configMap 'anotherone' with values 'var6=val6', 'var7=val7'. Load this configMap as env variables into a new nginx pod
+### 'var6=val6','var7=val7'をもつconfigMap'anotherone'を作成し、新しいnginxのPodから環境変数として読み込んでください
 
 <details><summary>show</summary>
 <p>
@@ -158,9 +159,9 @@ spec:
     imagePullPolicy: IfNotPresent
     name: nginx
     resources: {}
-    envFrom: # different than previous one, that was 'env'
-    - configMapRef: # different from the previous one, was 'configMapKeyRef'
-        name: anotherone # the name of the config map
+    envFrom: # 前問は'env'でしたが、違う値です
+    - configMapRef: # 前問は'configMapKeyRef'でしたが、違う値です
+        name: anotherone # configMapの名前
   dnsPolicy: ClusterFirst
   restartPolicy: Never
 status: {}
@@ -174,7 +175,7 @@ kubectl exec -it nginx -- env
 </p>
 </details>
 
-### Create a configMap 'cmvolume' with values 'var8=val8', 'var9=val9'. Load this as a volume inside an nginx pod on path '/etc/lala'. Create the pod and 'ls' into the '/etc/lala' directory.
+### 'var8=val8','var9=val9'の値をもつ'cmvolume'というconfigMapを作成し、nginxが稼働するpodの/etc/lala内にボリュームとして読み込んでください。そして、/etc/lalaディレクトリ内を'ls'で表示してください
 
 <details><summary>show</summary>
 <p>
@@ -194,18 +195,18 @@ metadata:
     run: nginx
   name: nginx
 spec:
-  volumes: # add a volumes list
-  - name: myvolume # just a name, you'll reference this in the pods
+  volumes: # 追加するvolumeのリスト
+  - name: myvolume # ただの名前です、Pod内で参照します
     configMap:
-      name: cmvolume # name of your configmap
+      name: cmvolume # configMapの名前です
   containers:
   - image: nginx
     imagePullPolicy: IfNotPresent
     name: nginx
     resources: {}
-    volumeMounts: # your volume mounts are listed here
-    - name: myvolume # the name that you specified in pod.spec.volumes.name
-      mountPath: /etc/lala # the path inside your container
+    volumeMounts: # volumeマウントをここに列挙します
+    - name: myvolume # pod.spec.volumes.nameに定義した名前です
+      mountPath: /etc/lala # コンテナ内の何処にマウントするかの定義です
   dnsPolicy: ClusterFirst
   restartPolicy: Never
 status: {}
@@ -215,8 +216,8 @@ status: {}
 kubectl create -f pod.yaml
 kubectl exec -it nginx -- /bin/sh
 cd /etc/lala
-ls # will show var8 var9
-cat var8 # will show val8
+ls # var8 var9 と表示されます
+cat var8 # val8 と表示されます
 ```
 
 </p>
@@ -224,9 +225,9 @@ cat var8 # will show val8
 
 ## SecurityContext
 
-kubernetes.io > Documentation > Tasks > Configure Pods and Containers > [Configure a Security Context for a Pod or Container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+kubernetes.io > ドキュメント > タスク > Podとコンテナの設定 > [Configure a Security Context for a Pod or Container (en)](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
 
-### Create the YAML for an nginx pod that runs with the user ID 101. No need to create the pod
+### UID 101で実行されるnginxのPodのYAMLを作成してください。実際にPodを作る必要はありません
 
 <details><summary>show</summary>
 <p>
@@ -245,8 +246,8 @@ metadata:
     run: nginx
   name: nginx
 spec:
-  securityContext: # insert this line
-    runAsUser: 101 # UID for the user
+  securityContext: # この行を追加します
+    runAsUser: 101 # UIDを記述します
   containers:
   - image: nginx
     imagePullPolicy: IfNotPresent
@@ -260,8 +261,7 @@ status: {}
 </p>
 </details>
 
-
-### Create the YAML for an nginx pod that has the capabilities "NET_ADMIN", "SYS_TIME" added on its single container
+### "NET_ADMIN"と"SYS_TIME"の機能が付加さたnginxのPodのYAMLを作成してください
 
 <details><summary>show</summary>
 <p>
@@ -284,9 +284,9 @@ spec:
   - image: nginx
     imagePullPolicy: IfNotPresent
     name: nginx
-    securityContext: # insert this line
-      capabilities: # and this
-        add: ["NET_ADMIN", "SYS_TIME"] # this as well
+    securityContext: # この行を追加
+      capabilities: # これを追加
+        add: ["NET_ADMIN", "SYS_TIME"] # これも追加
     resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Never
@@ -298,9 +298,10 @@ status: {}
 
 ## Requests and limits
 
-kubernetes.io > Documentation > Tasks > Configure Pods and Containers > [Assign CPU Resources to Containers and Pods](https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/)
+kubernetes.io > ドキュメント > タスク > Podとコンテナの設定 > [コンテナおよびPodへのCPUリソースの割り当て](https://kubernetes.io/ja/docs/tasks/configure-pod-container/assign-cpu-resource/)
 
 ### Create an nginx pod with requests cpu=100m,memory=256Mi and limits cpu=200m,memory=512Mi
+### cpu=100m,memory=256Miを要求して、cpu=200m,memory=512Miのリソース制限をもつnginxのPodを作成してください
 
 <details><summary>show</summary>
 <p>
@@ -314,11 +315,11 @@ kubectl run nginx --image=nginx --restart=Never --requests='cpu=100m,memory=256M
 
 ## Secrets
 
-kubernetes.io > Documentation > Concepts > Configuration > [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
+kubernetes.io > ドキュメント > コンセプト > 設定 > [Secrets](https://kubernetes.io/ja/docs/concepts/configuration/secret/)
 
-kubernetes.io > Documentation > Tasks > Inject Data Into Applications > [Distribute Credentials Securely Using Secrets](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/)
+kubernetes.io > ドキュメント > タスク > アプリケーションへのデータ注入 > [Distribute Credentials Securely Using Secrets(en)](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/)
 
-### Create a secret called mysecret with the values password=mypass
+### mysecretという名前で、password=mypassの値をもつSecretを作成してください
 
 <details><summary>show</summary>
 <p>
@@ -331,8 +332,9 @@ kubectl create secret generic mysecret --from-literal=password=mypass
 </details>
 
 ### Create a secret called mysecret2 that gets key/value from a file
+### ファイルからキー/値を取得して、mysecret2という名前のSecretを作成してください
 
-Create a file called username with the value admin:
+adminという内容で、usernameというファイルを作成します:
 
 ```bash
 echo -n admin > username
@@ -348,26 +350,26 @@ kubectl create secret generic mysecret2 --from-file=username
 </p>
 </details>
 
-### Get the value of mysecret2
+### mysecret2の値を取得してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl get secret mysecret2 -o yaml
-echo YWRtaW4K | base64 -d # on MAC it is -D, which decodes the value and shows 'admin'
+echo YWRtaW4K | base64 -d # MACでは -D にしてください、値がデコードされて'admin'と表示されます
 ```
 
-Alternative:
+もしくは:
 
 ```bash
-kubectl get secret mysecret2 -o jsonpath='{.data.username}{"\n"}' | base64 -d  # on MAC it is -D
+kubectl get secret mysecret2 -o jsonpath='{.data.username}{"\n"}' | base64 -d  # MACでは -D にしてください
 ```
 
 </p>
 </details>
 
-### Create an nginx pod that mounts the secret mysecret2 in a volume on path /etc/foo
+### mysecret2を/etc/foo以下にボリュームとしてマウントしてあるnginxのpodを作成してください
 
 <details><summary>show</summary>
 <p>
@@ -386,18 +388,18 @@ metadata:
     run: nginx
   name: nginx
 spec:
-  volumes: # specify the volumes
-  - name: foo # this name will be used for reference inside the container
-    secret: # we want a secret
-      secretName: mysecret2 # name of the secret - this must already exist on pod creation
+  volumes: # volumesを定義
+  - name: foo # この名前は後で参照します
+    secret: # secretが必要です
+      secretName: mysecret2 # secretの名前 - Podの作成時に存在している必要があります
   containers:
   - image: nginx
     imagePullPolicy: IfNotPresent
     name: nginx
     resources: {}
-    volumeMounts: # our volume mounts
-    - name: foo # name on pod.spec.volumes
-      mountPath: /etc/foo #our mount path
+    volumeMounts: # volumeのマウントを定義します
+    - name: foo # pod.spec.volumesの名前
+      mountPath: /etc/foo # マウントパス
   dnsPolicy: ClusterFirst
   restartPolicy: Never
 status: {}
@@ -406,14 +408,15 @@ status: {}
 ```bash
 kubectl create -f pod.yaml
 kubectl exec -it nginx /bin/bash
-ls /etc/foo  # shows username
-cat /etc/foo/username # shows admin
+ls /etc/foo  # usernameと表示されます
+cat /etc/foo/username # adminと表示されます
 ```
 
 </p>
 </details>
 
 ### Delete the pod you just created and mount the variable 'username' from secret mysecret2 onto a new nginx pod in env variable called 'USERNAME'
+### 作成したPodを削除して、新しく'USERNAME'という環境変数にmysecret2のusernameが設定されたnginxのPodを作成してください
 
 <details><summary>show</summary>
 <p>
@@ -438,12 +441,12 @@ spec:
     imagePullPolicy: IfNotPresent
     name: nginx
     resources: {}
-    env: # our env variables
-    - name: USERNAME # asked name
+    env: # 環境変数の定義です
+    - name: USERNAME # 名前です
       valueFrom:
-        secretKeyRef: # secret reference
-          name: mysecret2 # our secret's name
-          key: username # the key of the data in the secret
+        secretKeyRef: # secretを参照
+          name: mysecret2 # secretの名前
+          key: username # secret内のキーの値
   dnsPolicy: ClusterFirst
   restartPolicy: Never
 status: {}
@@ -451,7 +454,7 @@ status: {}
 
 ```bash
 kubectl create -f pod.yaml
-kubectl exec -it nginx -- env | grep USERNAME | cut -d '=' -f 2 # will show 'admin'
+kubectl exec -it nginx -- env | grep USERNAME | cut -d '=' -f 2 # 'admin'と表示されます
 ```
 
 </p>
@@ -459,9 +462,9 @@ kubectl exec -it nginx -- env | grep USERNAME | cut -d '=' -f 2 # will show 'adm
 
 ## ServiceAccounts
 
-kubernetes.io > Documentation > Tasks > Configure Pods and Containers > [Configure Service Accounts for Pods](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
+kubernetes.io > ドキュメント > タスク > Podとコンテナの設定 > [Configure Service Accounts for Pods(en)](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
 
-### See all the service accounts of the cluster in all namespaces
+### すべてのネームスペース内にある、すべてのサービスアカウントを表示してください
 
 <details><summary>show</summary>
 <p>
@@ -469,7 +472,7 @@ kubernetes.io > Documentation > Tasks > Configure Pods and Containers > [Configu
 ```bash
 kubectl get sa --all-namespaces
 ```
-Alternatively 
+もしくは;
 
 ```bash
 kubectl get sa -A
@@ -478,7 +481,7 @@ kubectl get sa -A
 </p>
 </details>
 
-### Create a new serviceaccount called 'myuser'
+### 'myuser'という名前のサービスアカウントを新しく作成してください
 
 <details><summary>show</summary>
 <p>
@@ -487,10 +490,10 @@ kubectl get sa -A
 kubectl create sa myuser
 ```
 
-Alternatively:
+または:
 
 ```bash
-# let's get a template easily
+# テンプレートを簡単に入手します
 kubectl get sa default -o yaml > sa.yaml
 vim sa.yaml
 ```
@@ -509,7 +512,7 @@ kubectl create -f sa.yaml
 </p>
 </details>
 
-### Create an nginx pod that uses 'myuser' as a service account
+### 'myuser'サービスアカウントを利用して、nginxのpodを作成してください
 
 <details><summary>show</summary>
 <p>
@@ -519,7 +522,7 @@ kubectl run nginx --image=nginx --restart=Never --serviceaccount=myuser -o yaml 
 kubectl apply -f pod.yaml
 ```
 
-or you can add manually:
+または手動で追加します:
 
 ```bash
 kubectl run nginx --image=nginx --restart=Never -o yaml --dry-run=client > pod.yaml
@@ -535,7 +538,7 @@ metadata:
     run: nginx
   name: nginx
 spec:
-  serviceAccountName: myuser # we use pod.spec.serviceAccountName
+  serviceAccountName: myuser # pod.spec.serviceAccountNameを利用して追加します
   containers:
   - image: nginx
     imagePullPolicy: IfNotPresent
@@ -548,7 +551,7 @@ status: {}
 
 ```bash
 kubectl create -f pod.yaml
-kubectl describe pod nginx # will see that a new secret called myuser-token-***** has been mounted
+kubectl describe pod nginx # myuser-token-***** という新しいシークレットがマウントされている事が確認できます
 ```
 
 
