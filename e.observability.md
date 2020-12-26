@@ -3,9 +3,9 @@
 
 ## Liveness and readiness probes
 
-kubernetes.io > Documentation > Tasks > Configure Pods and Containers > [Configure Liveness and Readiness Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/)
+kubernetes.io > ドキュメント > タスク > Podとコンテナの設定 > [Liveness Probe、Readiness ProbeおよびStartup Probeを使用する](https://kubernetes.io/ja/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
 
-### Create an nginx pod with a liveness probe that just runs the command 'ls'. Save its YAML in pod.yaml. Run it, check its probe status, delete it.
+### 'ls'コマンドを実行するだけのlivenessProbe付きnginxのPodを作成するYAMLをpod.yamlという名前で保存して、それを実行、probeの状態を確認したら削除してください
 
 <details><summary>show</summary>
 <p>
@@ -29,10 +29,10 @@ spec:
     imagePullPolicy: IfNotPresent
     name: nginx
     resources: {}
-    livenessProbe: # our probe
-      exec: # add this line
-        command: # command definition
-        - ls # ls command
+    livenessProbe: # Probeの定義です
+      exec: # この行を追加します
+        command: # commandの定義
+        - ls # lsコマンド
   dnsPolicy: ClusterFirst
   restartPolicy: Never
 status: {}
@@ -40,20 +40,20 @@ status: {}
 
 ```bash
 kubectl create -f pod.yaml
-kubectl describe pod nginx | grep -i liveness # run this to see that liveness probe works
+kubectl describe pod nginx | grep -i liveness # これを実行するとlivenessProbeが動作している事がわかります
 kubectl delete -f pod.yaml
 ```
 
 </p>
 </details>
 
-### Modify the pod.yaml file so that liveness probe starts kicking in after 5 seconds whereas the interval between probes would be 5 seconds. Run it, check the probe, delete it.
+### pod.yamlを変更して、livenessProbeが5秒後に開始され、以降5秒毎に実行されるようにしてください。それを実行し、probeを確認し、削除してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
-kubectl explain pod.spec.containers.livenessProbe # get the exact names
+kubectl explain pod.spec.containers.livenessProbe # 正確な名前を取得します
 ```
 
 ```YAML
@@ -71,8 +71,8 @@ spec:
     name: nginx
     resources: {}
     livenessProbe: 
-      initialDelaySeconds: 5 # add this line
-      periodSeconds: 5 # add this line as well
+      initialDelaySeconds: 5 # この行を追加します
+      periodSeconds: 5 # この行も追加します
       exec:
         command:
         - ls
@@ -90,7 +90,7 @@ kubectl delete -f pod.yaml
 </p>
 </details>
 
-### Create an nginx pod (that includes port 80) with an HTTP readinessProbe on path '/' on port 80. Again, run it, check the readinessProbe, delete it.
+### (80番ポートを公開して)nginxのpodを起動し、ポート80の'/'をHTTPでチェックするreadinessProbeを持たせて起動させてください、その後readinessProbeを確認して削除してください
 
 <details><summary>show</summary>
 <p>
@@ -115,9 +115,9 @@ spec:
     name: nginx
     resources: {}
     ports:
-      - containerPort: 80 # Note: Readiness probes runs on the container during its whole lifecycle. Since nginx exposes 80, containerPort: 80 is not required for readiness to work.
-    readinessProbe: # declare the readiness probe
-      httpGet: # add this line
+      - containerPort: 80 # Note: readinessProbeはコンテナでそのライフサイクル中に渡って働きます。nginxが80番ポートを公開するので、containerPort: 80 はreadinessの稼働に直接必要ではありません。
+    readinessProbe: # readinessProbeを定義します
+      httpGet: # この行を追加します
         path: / #
         port: 80 #
   dnsPolicy: ClusterFirst
@@ -127,7 +127,7 @@ status: {}
 
 ```bash
 kubectl create -f pod.yaml
-kubectl describe pod nginx | grep -i readiness # to see the pod readiness details
+kubectl describe pod nginx | grep -i readiness # readnessの状態を確認します
 kubectl delete -f pod.yaml
 ```
 
@@ -136,14 +136,14 @@ kubectl delete -f pod.yaml
 
 ## Logging
 
-### Create a busybox pod that runs 'i=0; while true; do echo "$i: $(date)"; i=$((i+1)); sleep 1; done'. Check its logs
+### busyboxのPodを作成し、'i=0; while true; do echo "$i: $(date)"; i=$((i+1)); sleep 1; done'を実行、そのログを取得してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl run busybox --image=busybox --restart=Never -- /bin/sh -c 'i=0; while true; do echo "$i: $(date)"; i=$((i+1)); sleep 1; done'
-kubectl logs busybox -f # follow the logs
+kubectl logs busybox -f # ログを参照します
 ```
 
 </p>
@@ -151,14 +151,14 @@ kubectl logs busybox -f # follow the logs
 
 ## Debugging
 
-### Create a busybox pod that runs 'ls /notexist'. Determine if there's an error (of course there is), see it. In the end, delete the pod
+### 'ls /notexist'を実行するbusyboxのPodを作成してください、そしてエラーが存在するか確認してください(もちろん、エラーになります)、エラーを確認した後Podを終了して消してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl run busybox --restart=Never --image=busybox -- /bin/sh -c 'ls /notexist'
-# show that there's an error
+# それがエラーになっている事を確認します
 kubectl logs busybox
 kubectl describe po busybox
 kubectl delete po busybox
@@ -167,24 +167,24 @@ kubectl delete po busybox
 </p>
 </details>
 
-### Create a busybox pod that runs 'notexist'. Determine if there's an error (of course there is), see it. In the end, delete the pod forcefully with a 0 grace period
+### 'notexist'を実行するbusyboxのPodを作成し、それがエラーになる事を確認します(もちろんエラーです)、それを確認してPodを終了させたら、Podを猶予時間0で強制的に消してください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl run busybox --restart=Never --image=busybox -- notexist
-kubectl logs busybox # will bring nothing! container never started
-kubectl describe po busybox # in the events section, you'll see the error
-# also...
-kubectl get events | grep -i error # you'll see the error here as well
+kubectl logs busybox # なにも表示されません！ コンテナは立ち上がりません
+kubectl describe po busybox # eventsセクションにエラーが記録されています
+# また...
+kubectl get events | grep -i error # これでも同じようにエラーを確認できます
 kubectl delete po busybox --force --grace-period=0
 ```
 
 </p>
 </details>
 
-### Get CPU/memory utilization for nodes ([metrics-server](https://github.com/kubernetes-incubator/metrics-server) must be running)
+### NodeのCPUとメモリの利用率を取得してください ([metrics-server](https://github.com/kubernetes-incubator/metrics-server)が実行されている必要があります)
 
 <details><summary>show</summary>
 <p>

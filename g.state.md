@@ -1,26 +1,27 @@
 ![](https://gaforgithub.azurewebsites.net/api?repo=CKAD-exercises/state&empty)
 # State Persistence (8%)
 
-kubernetes.io > Documentation > Tasks > Configure Pods and Containers > [Configure a Pod to Use a Volume for Storage](https://kubernetes.io/docs/tasks/configure-pod-container/configure-volume-storage/)
+kubernetes.io > ドキュメント > タスク > Podとコンテナの設定 > [ストレージにボリュームを使用するPodを構成する](https://kubernetes.io/ja/docs/tasks/configure-pod-container/configure-volume-storage/)
 
-kubernetes.io > Documentation > Tasks > Configure Pods and Containers > [Configure a Pod to Use a PersistentVolume for Storage](https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/)
+kubernetes.io > ドキュメント > タスク > Podとコンテナの設定 > [Configure a Pod to Use a PersistentVolume for Storage(en)](https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/)
 
 ## Define volumes 
 
 ### Create busybox pod with two containers, each one will have the image busybox and will run the 'sleep 3600' command. Make both containers mount an emptyDir at '/etc/foo'. Connect to the second busybox, write the first column of '/etc/passwd' file to '/etc/foo/passwd'. Connect to the first busybox and write '/etc/foo/passwd' file to standard output. Delete pod.
+### busyboxのPodを2つ作成します。片方は'sleep 3600'のコマンドを実行するbusyboxイメージです。両方のコンテナ内の'/etc/foo'に空のディレクトリをマウントします。2つ目のbusyboxに接続し、'/etc/passwd'の1行目を'/etc/foo/passwd'に書き込みます。最初のbusyboxに接続し、'/etc/foo/passwd'を標準出力に出力します。その後Podを削除しましょう
 
 <details><summary>show</summary>
 <p>
 
-*This question is probably a better fit for the 'Multi-container-pods' section but I'm keeping it here as it will help you get acquainted with state*
+*この質問は'Multi-container-pods'に適していますが、状況理解に役立つため、ここに記載しています*
 
-Easiest way to do this is to create a template pod with:
+一番簡単な方法は、Podのテンプレートを使う方法です:
 
 ```bash
 kubectl run busybox --image=busybox --restart=Never -o yaml --dry-run=client -- /bin/sh -c 'sleep 3600' > pod.yaml
 vi pod.yaml
 ```
-Copy paste the container definition and type the lines that have a comment in the end:
+コンテナの定義をコピー&ペーストして、コメントがある行を最後に入力します:
 
 ```YAML
 apiVersion: v1
@@ -50,7 +51,7 @@ spec:
     - -c
     - sleep 3600
     image: busybox
-    name: busybox2 # don't forget to change the name during copy paste, must be different from the first container's name!
+    name: busybox2 # コピー&ペーストの際、名前を変更する事を忘れないでください。最初のコンテナ名と別である必要があります。
     volumeMounts: #
     - name: myvolume #
       mountPath: /etc/foo #
@@ -59,20 +60,21 @@ spec:
     emptyDir: {} #
 ```
 
-Connect to the second container:
+2つめのコンテナに接続します:
 
 ```bash
 kubectl exec -it busybox -c busybox2 -- /bin/sh
 cat /etc/passwd | cut -f 1 -d ':' > /etc/foo/passwd 
-cat /etc/foo/passwd # confirm that stuff has been written successfully
+cat /etc/foo/passwd # 正常に書き込めたことを確認します
 exit
 ```
 
 Connect to the first container:
+1つめのコンテナに接続します:
 
 ```bash
 kubectl exec -it busybox -c busybox -- /bin/sh
-mount | grep foo # confirm the mounting
+mount | grep foo # マウントされている事を確認します
 cat /etc/foo/passwd
 exit
 kubectl delete po busybox
@@ -82,7 +84,7 @@ kubectl delete po busybox
 </details>
 
 
-### Create a PersistentVolume of 10Gi, called 'myvolume'. Make it have accessMode of 'ReadWriteOnce' and 'ReadWriteMany', storageClassName 'normal', mounted on hostPath '/etc/foo'. Save it on pv.yaml, add it to the cluster. Show the PersistentVolumes that exist on the cluster
+### 'myvolume'という名前で10GiのPersistentVolumeを作成します。アクセスモードは'ReadWriteOnce'、'ReadWriteMany'、ストレージクラス名は'normal'で、ホストの'/etc/foo'にマウントします。これをpv.yamlに保存してクラスタに追加してください。PersistentVolumesがクラスタに存在する事を確認します。
 
 <details><summary>show</summary>
 <p>
@@ -107,11 +109,11 @@ spec:
     path: /etc/foo
 ```
 
-Show the PersistentVolumes:
+PersistentVolumeを表示します:
 
 ```bash
 kubectl create -f pv.yaml
-# will have status 'Available'
+# 'Available'状態になっているはずです
 kubectl get pv
 ```
 
@@ -119,6 +121,7 @@ kubectl get pv
 </details>
 
 ### Create a PersistentVolumeClaim for this storage class, called mypvc, a request of 4Gi and an accessMode of ReadWriteOnce, with the storageClassName of normal, and save it on pvc.yaml. Create it on the cluster. Show the PersistentVolumeClaims of the cluster. Show the PersistentVolumes of the cluster
+### mypvcという名前でPersistentVolumeClaimをこのストレージクラス向けに作成します。4Giをリクエストし、アクセスモードはReadWriteOnce、ストレージクラス名はnormalです。これをpvc.yamlという名前で保存し、クラスタに適用してください。クラスタにあるPersistentVolumeClaimを表示し、PersistentVolumeも表示してください
 
 <details><summary>show</summary>
 <p>
@@ -141,35 +144,36 @@ spec:
       storage: 4Gi
 ```
 
-Create it on the cluster:
+クラスタに適用します:
 
 ```bash
 kubectl create -f pvc.yaml
 ```
 
-Show the PersistentVolumeClaims and PersistentVolumes:
+PersistentVolumeClaimとPersistentVolumeを表示します:
 
 ```bash
-kubectl get pvc # will show as 'Bound'
-kubectl get pv # will show as 'Bound' as well
+kubectl get pvc # 'Bound'と表示されます
+kubectl get pv # こちらも'Bound'と表示されます
 ```
 
 </p>
 </details>
 
 ### Create a busybox pod with command 'sleep 3600', save it on pod.yaml. Mount the PersistentVolumeClaim to '/etc/foo'. Connect to the 'busybox' pod, and copy the '/etc/passwd' file to '/etc/foo/passwd'
+### busyboxで'sleep 3600'を実行するPodを作成し、それをpod.yamlという名前で保存します。PersistentVolumeClaimを'/etc/foo'にマウントして、busyboxPodに接続、ファイル'/etc/passwd'を'/etc/foo/passwd'にコピーしてください
 
 <details><summary>show</summary>
 <p>
 
-Create a skeleton pod:
+Podの雛形を作ります:
 
 ```bash
 kubectl run busybox --image=busybox --restart=Never -o yaml --dry-run=client -- /bin/sh -c 'sleep 3600' > pod.yaml
 vi pod.yaml
 ```
 
-Add the lines that finish with a comment:
+コメントで終了する行を追記します:
 
 ```YAML
 apiVersion: v1
@@ -201,13 +205,13 @@ spec:
 status: {}
 ```
 
-Create the pod:
+Podを作成します:
 
 ```bash
 kubectl create -f pod.yaml
 ```
 
-Connect to the pod and copy '/etc/passwd' to '/etc/foo/passwd':
+Podに接続して、'/etc/passwd'を'/etc/foo/passwd'にコピーします:
 
 ```bash
 kubectl exec busybox -it -- cp /etc/passwd /etc/foo/passwd
@@ -216,48 +220,50 @@ kubectl exec busybox -it -- cp /etc/passwd /etc/foo/passwd
 </p>
 </details>
 
-### Create a second pod which is identical with the one you just created (you can easily do it by changing the 'name' property on pod.yaml). Connect to it and verify that '/etc/foo' contains the 'passwd' file. Delete pods to cleanup. Note: If you can't see the file from the second pod, can you figure out why? What would you do to fix that?
-
+### 前問で作成したものと同じPodを作成します(pod.yamlの'name'を書き換える事で簡単に作成できます)。それに接続して、'/etc/foo'内に'passwd'ファイルが存在する事を確認してください。Podを削除して掃除します。Note: もし2番目のPodにファイルが見えない場合、その理由はわかりますか？どうやって修正しますか？
 
 
 <details><summary>show</summary>
 <p>
 
 Create the second pod, called busybox2:
+busybox2という名前で2つ目のPodを作成します:
 
 ```bash
 vim pod.yaml
-# change 'metadata.name: busybox' to 'metadata.name: busybox2'
+# 'metadata.name: busybox'を'metadata.name: busybox2'に書き換えます
 kubectl create -f pod.yaml
-kubectl exec busybox2 -- ls /etc/foo # will show 'passwd'
-# cleanup
+kubectl exec busybox2 -- ls /etc/foo # 'passwd'と表示されます
+# お掃除
 kubectl delete po busybox busybox2
 ```
 
 If the file doesn't show on the second pod but it shows on the first, it has most likely been scheduled on a different node.
+もし2つ目のPodにファイルがなく、1つ目のPodにある場合、ほとんどは別のNodeにスケジュールされています。
 
 ```bash
-# check which nodes the pods are on
+# PodがどのNodeで動作しているかを確認します
 kubectl get po busybox -o wide
 kubectl get po busybox2 -o wide
 ```
 
-If they are on different nodes, you won't see the file, because we used the `hostPath` volume type.
-If you need to access the same files in a multi-node cluster, you need a volume type that is independent of a specific node.
-There are lots of different types per cloud provider (see here)[https://kubernetes.io/docs/concepts/storage/persistent-volumes/#types-of-persistent-volumes], a general solution could be to use NFS.
+もしそれが別のNodeなら、ファイルを見ることはできません。なぜならば、`hostpath`ボリュームタイプを利用しているからです。
+マルチノードクラスタで同じファイルにアクセスしたいなら、ボリュームタイプを特定のノードに依存しないものにする必要があります。
+クラウドプロバイダごとに、様々なタイプがあります(ここを参照)[https://kubernetes.io/ja/docs/concepts/storage/persistent-volumes/#types-of-persistent-volumes]、一般的な方法はNFSを使用することです。
 
 </p>
 </details>
 
 ### Create a busybox pod with 'sleep 3600' as arguments. Copy '/etc/passwd' from the pod to your local folder
+### 'sleep 3600'の引数を実行するbusyboxを作成し、'/etc/passwd'をPodからローカルマシンのフォルダへコピーしてください
 
 <details><summary>show</summary>
 <p>
 
 ```bash
 kubectl run busybox --image=busybox --restart=Never -- sleep 3600
-kubectl cp busybox:/etc/passwd ./passwd # kubectl cp command
-# previous command might report an error, feel free to ignore it since copy command works
+kubectl cp busybox:/etc/passwd ./passwd # kubectl cp コマンドを利用します
+# このコマンドはエラーを返す事がありますが、コピーは正常に行われているので無視して構いません。
 cat passwd
 ```
 
