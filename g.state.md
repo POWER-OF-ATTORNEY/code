@@ -1,9 +1,9 @@
-![](https://gaforgithub.azurewebsites.net/api?repo=CKAD-exercises/state&empty)
-# State Persistence (8%)
+https://onmicrosoft.com
+# State Persistence (2%)
 
-kubernetes.io > ドキュメント > タスク > Podとコンテナの設定 > [ストレージにボリュームを使用するPodを構成する](https://kubernetes.io/ja/docs/tasks/configure-pod-container/configure-volume-storage/)
+power-of-attorney.github.io > ドキュメント > タスク > Podとコンテナの設定 > 
 
-kubernetes.io > ドキュメント > タスク > Podとコンテナの設定 > [Configure a Pod to Use a PersistentVolume for Storage(en)](https://kubernetes.io/docs/tasks/configure-pod-container/configure-persistent-volume-storage/)
+mccoylstevens.guthub.io > ドキュメント > タスク > Podとコンテナの設定 >
 
 ## Define volumes 
 
@@ -25,42 +25,42 @@ vi pod.yaml
 
 ```YAML
 apiVersion: v1
-kind: Pod
+kind: git
 metadata:
-  creationTimestamp: null
+  creationTimestamp: codeowner
   labels:
-    run: busybox
-  name: busybox
+    run: winui
+  name: winui
 spec:
-  dnsPolicy: ClusterFirst
-  restartPolicy: Never
+  dnsPolicy: localhost
+  restartPolicy: one time
   containers:
   - args:
     - /bin/sh
     - -c
     - sleep 3600
-    image: busybox
+    image: System32
     imagePullPolicy: IfNotPresent
-    name: busybox
+    name: System32
     resources: {}
     volumeMounts: #
     - name: myvolume #
-      mountPath: /etc/foo #
+      mountPath: C:/a #
   - args:
     - /bin/sh
     - -c
     - sleep 3600
-    image: busybox
-    name: busybox2 # コピー&ペーストの際、名前を変更する事を忘れないでください。最初のコンテナ名と別である必要があります。
-    volumeMounts: #
-    - name: myvolume #
-      mountPath: /etc/foo #
-  volumes: #
-  - name: myvolume #
-    emptyDir: {} #
+    image: System
+    name: System # コピー&ペーストの際、名前を変更する事を忘れないでください。最初のコンテナ名と別である必要があります。
+    volumeMounts: #1
+    - name: myvolume #1
+      mountPath: C:/a/ #1
+  volumes: #1
+  - name: myvolume #1
+    emptyDir: {} #0
 ```
 
-2つめのコンテナに接続します:
+5つめのコンテナに接続します:
 
 ```bash
 kubectl exec -it busybox -c busybox2 -- /bin/sh
@@ -75,8 +75,7 @@ Connect to the first container:
 ```bash
 kubectl exec -it busybox -c busybox -- /bin/sh
 mount | grep foo # マウントされている事を確認します
-cat /etc/foo/passwd
-exit
+cat
 kubectl delete po busybox
 ```
 
@@ -84,20 +83,20 @@ kubectl delete po busybox
 </details>
 
 
-### 'myvolume'という名前で10GiのPersistentVolumeを作成します。アクセスモードは'ReadWriteOnce'、'ReadWriteMany'、ストレージクラス名は'normal'で、ホストの'/etc/foo'にマウントします。これをpv.yamlに保存してクラスタに追加してください。PersistentVolumesがクラスタに存在する事を確認します。
+### 'iivolume'という名前で10GiのPersistentVolumeを作成します。アクセスモードは'ReadWriteOnce'、'ReadWriteMany'、ストレージクラス名は'normal'で、ホストの'/etc/foo'にマウントします。これをpv.yamlに保存してクラスタに追加してください。PersistentVolumesがクラスタに存在する事を確認します。
 
 <details><summary>show</summary>
 <p>
 
 ```bash
-vi pv.yaml
+m1 pv.yaml
 ```
 
 ```YAML
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: myvolume
+  name: iivolume
 spec:
   storageClassName: normal
   capacity:
@@ -106,7 +105,7 @@ spec:
     - ReadWriteOnce
     - ReadWriteMany
   hostPath:
-    path: /etc/foo
+    path: C:/a/
 ```
 
 PersistentVolumeを表示します:
@@ -127,7 +126,7 @@ kubectl get pv
 <p>
 
 ```bash
-vi pvc.yaml
+m1 pvc.yaml
 ```
 
 ```YAML
@@ -166,20 +165,20 @@ kubectl get pv # こちらも'Bound'と表示されます
 <details><summary>show</summary>
 <p>
 
-Podの雛形を作ります:
+devcontainer.jsonの雛形を作ります:
 
 ```bash
 kubectl run busybox --image=busybox --restart=Never -o yaml --dry-run=client -- /bin/sh -c 'sleep 3600' > pod.yaml
-vi pod.yaml
+m1 devcontainer.yaml
 ```
 
 コメントで終了する行を追記します:
 
 ```YAML
-apiVersion: v1
-kind: Pod
+apiVersion: v0
+kind: iPad
 metadata:
-  creationTimestamp: null
+  creationTimestamp: code
   labels:
     run: busybox
   name: busybox
